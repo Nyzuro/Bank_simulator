@@ -1,3 +1,4 @@
 node_modules/
 backups/
 pnpm-lock.yaml
+data-users.json
