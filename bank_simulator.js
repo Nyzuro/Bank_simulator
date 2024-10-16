@@ -14,12 +14,14 @@ const reset_green = "\x1b[0m";
 const red = "\x1b[0;31m";
 const reset_red = "\x1b[0m";
 
+console.clear();
+
 function connected() {
 if (!current_user){
   console.log(`${red}Not connected${reset_red}\n`);
 }
 else {
-  console.log(`${green}Connected as ${current_user}${reset_green}\n`);
+  console.log(`${green}Connected as ${current_user.username}${reset_green}\n`);
 }
 }
 connected();
@@ -29,7 +31,7 @@ console.log("What do you wanna do?\n");
 
 function menu() {
   let choice = readlineSync.question(
-    "1 : Create an account\n2 : Log in\n3 : Check the balance\n4 : Make a deposit\n5 : Make a withdrawal\n6 : Log out\n"
+    "1 : Create an account\n2 : Log in\n3 : Check the balance\n4 : Make a deposit\n5 : Make a withdrawal\n6 : Log out\n7 : Stop the program\n"
   );
 
   switch (choice) {
@@ -56,6 +58,10 @@ function menu() {
     case "6":
       console.clear();
       log_out();
+      break;
+    case "7":
+      console.clear();
+      quit();
       break;
     default:
       console.clear();
@@ -96,6 +102,7 @@ function create_account() {
     return;
   } 
   else {
+    console.clear();
     connected();
     console.log(`${red}This username already exist, try another.${reset_red}`);
     menu();
@@ -105,8 +112,8 @@ function create_account() {
 
 function log_in() {
   if(current_user){
-    console.log(`${red}You are already connected to an account${reset_red}\n`)
     connected();
+    console.log(`${red}You are already connected to an account${reset_red}\n`);
     menu()
     return;
   }
@@ -118,8 +125,9 @@ function log_in() {
   const user = users.find((u) => u.username === log_username);
 
   if (!user) {
-    console.log(`${red}User not found, please create an account.${reset_red}`);
+    console.clear()
     connected();
+    console.log(`${red}User not found, please create an account.${reset_red}`);
     menu();
     return;
   }
@@ -134,6 +142,7 @@ function log_in() {
     return;
   } 
   else {
+    connected();
     console.log(`${red}Incorrect password, please try again${reset_red}`);
     menu();
     return;
@@ -142,22 +151,26 @@ function log_in() {
 
 function check_balance() {
   if (!current_user) {
+    connected();
     console.log(`${red}Please log in first${reset_red}\n`);
     menu();
     return;
   } 
   
   else if (current_user.money > 0) {
+    connected();
     console.log(
       `${current_user.username} You have ${green}${current_user.money}$${reset_green} on your account\n`
     );
   } 
   else if (current_user.money < 0) {
+    connected();
     console.log(
       `${current_user.username} You have ${red}${current_user.money}$${reset_red} on your account\n`
     );
   } 
   else {
+    connected();
     console.log(
       `${current_user.username} You have ${current_user.money}$ on your account\n`
     );
@@ -167,6 +180,7 @@ function check_balance() {
 
 function deposit() {
   if (!current_user) {
+    connected();
     console.log(`${red}Please log in first${reset_red}\n`);
     menu();
     return;
@@ -178,6 +192,7 @@ function deposit() {
   console.clear()
 
   if (has_letter) {
+    connected();
     console.log("Please write just the number of what you want to deposit\n");
   } 
   
@@ -185,7 +200,7 @@ function deposit() {
     const users = db.get("users");
     current_user.money = current_user.money + parseInt(deposit);
     db.set("users", users);
-
+    connected();
     console.log(`You have deposited ${green}${deposit}$${reset_green}\n`);
   }
   menu();
@@ -193,6 +208,7 @@ function deposit() {
 
 function withdrawal() {
   if (!current_user) {
+    connected();
     console.log(`${red}Please log in first${reset_red}\n`);
     menu();
     return;
@@ -204,6 +220,7 @@ function withdrawal() {
   console.clear()
 
   if (has_letter) {
+    connected();
     console.log("Please write just the number of what you want to deposit\n");
   } 
   
@@ -211,22 +228,39 @@ function withdrawal() {
     const users = db.get("users");
     current_user.money = current_user.money - parseInt(withdrawal);
     db.set("users", users);
-
+    connected();
     console.log(`You have withdrawn ${red}${withdrawal}$${reset_red}\n`);
   }
   menu();
 }
 
 function log_out() {
-  let log_out = question("Are you sure you want to log out (yes/no): ");
+  if (!current_user) {
+    connected();
+    console.log("You are not logged in\n")
+    menu();
+  }
+
+  connected();
+  let log_out = readlineSync.question("Are you sure you want to log out (yes/no): ");
+  
   if (log_out === "yes") {
   current_user = !current_user;
+  console.clear();
+  connected();
   menu();
   return;
   }
   else if (log_out === "no" ) {
-    console.log("Back to the menu...");
+    console.clear()
+    connected();
+    console.log("Back to the menu...\n");
     menu();
     return;
   }
+}
+
+function quit(){
+  console.log("Thanks for using my bank simulator!")
+  return false;
 }
