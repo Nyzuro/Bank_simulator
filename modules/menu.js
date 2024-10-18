@@ -9,7 +9,7 @@ let current_user;
 
 async function menu() {
   let choice = readlineSync.question(
-    "1 : Create an account\n2 : Log in\n3 : Check the balance\n4 : Make a deposit\n5 : Make a withdrawal\n6 : Log out\n7 : Stop the program\n"
+    "1 : Create an account\n2 : Log in\n3 : Check the balance\n4 : Make a deposit\n5 : Make a withdrawal\n6 : Log out\n7 : Make a transfer\n"
   );
 
   switch (choice) {
