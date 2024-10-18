@@ -1,29 +1,25 @@
 const readlineSync = require("readline-sync");
 const { db } = require('./database');
-const { menu } = require('./menu');
 
 const green = "\x1b[0;32m";
 const reset_green = "\x1b[0m";
 const red = "\x1b[0;31m";
 const reset_red = "\x1b[0m";
 
-let current_user;
-
-function connected() {
-	if (!current_user){
-		console.log(`${red}Not connected${reset_red}\n`);
-	}
-	else {
-		console.log(`${green}Connected as ${current_user.username}${reset_green}\n`);
-	}
+function connected(current_user) {
+  if (!current_user) {
+    console.log(`${red}Not connected${reset_red}\n`);
+  }
+  else {
+    console.log(`${green}Connected as ${current_user.username}${reset_green}\n`);
+  }
 }
 
-function create_account() {
-  if (current_user){
-    connected();
+async function create_account(current_user) {
+  if (current_user) {
+    connected(current_user);
     console.log(`${red}Please log out first${reset_red}\n`);
-    menu();
-    return; 
+    return current_user;
   }
 
   let username = readlineSync.question("Username : ");
@@ -40,27 +36,24 @@ function create_account() {
     db.push("users", { username: username, password: password, money: 0 });
 
     console.clear();
-    connected();
+    connected(current_user);
     console.log("Your account has been created, you can now log in.");
     console.log("Back to the menu...\n");
-    menu();
-    return;
-  } 
+    return current_user;
+  }
   else {
     console.clear();
-    connected();
+    connected(current_user);
     console.log(`${red}This username already exist, try another.${reset_red}`);
-    menu();
-    return;
+    return current_user;
   }
 }
 
-function log_in() {
-  if(current_user){
-    connected();
+async function log_in(current_user) {
+  if (current_user) {
+    connected(current_user);
     console.log(`${red}You are already connected to an account${reset_red}\n`);
-    menu()
-    return;
+    return current_user;
   }
 
   let log_username = readlineSync.question("\nUsername : ");
@@ -71,53 +64,48 @@ function log_in() {
 
   if (!user) {
     console.clear()
-    connected();
+    connected(current_user);
     console.log(`${red}User not found, please create an account.${reset_red}`);
-    menu();
-    return;
+    return current_user;
   }
 
   console.clear();
 
   if (user.password === log_password) {
-    current_user = user;
-    connected();
-    console.log(`\nWelcome back ${current_user.username}\n`);
-    menu();
-    return;
-  } 
+    connected(user);
+    console.log(`\nWelcome back ${user.username}\n`);
+    return user;
+  }
   else {
-    connected();
+    connected(current_user);
     console.log(`${red}Incorrect password, please try again${reset_red}`);
-    menu();
-    return;
+    return current_user;
   }
 }
 
-function log_out() {
+
+async function log_out(current_user) {
   if (!current_user) {
-    connected();
+    connected(current_user);
     console.log("You are not logged in\n")
-    menu();
+    return current_user;
   }
 
-  connected();
+  connected(current_user);
   let log_out = readlineSync.question("Are you sure you want to log out (yes/no): ");
-  
+
   if (log_out === "yes") {
-  current_user = !current_user;
-  console.clear();
-  connected();
-  menu();
-  return;
+    current_user = !current_user;
+    console.clear();
+    connected(current_user);
+    return current_user;
   }
-  else if (log_out === "no" ) {
+  else if (log_out === "no") {
     console.clear()
-    connected();
+    connected(current_user);
     console.log("Back to the menu...\n");
-    menu();
-    return;
+    return current_user;
   }
 }
 
-module.exports = { connected, create_account, log_in, log_out };
+module.exports = { connected, create_account, log_in, log_out, };
