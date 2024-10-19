@@ -88,17 +88,24 @@ async function withdrawal(current_user) {
   return current_user;
 }
 
-async function transfer() {
+async function transfer(current_user) {
   if (!current_user) {
-    connected();
+    connected(current_user);
     console.log(`${red}Please log in first${reset_red}\n`);
-    return;
+    return current_user;
   }
 
-  let transfer = readlineSync.question("Who do you want to make a transfer to (Username): ");
+  let transferUser = readlineSync.question("Who do you want to make a transfer to (Username): ");
+  console.clear();
 
   const users = db.get("users");
-  let receiver = users.find((receiver) => receiver.username === transfer);
+  let receiver = users.find((receiver) => receiver.username === transferUser);
+
+  if (!receiver) {
+    connected(current_user);
+    console.log(`${red}Username not found${reset_red}\n`);
+    return current_user;
+  }
 
   let transfer_amount = readlineSync.question("Indicate the amount of your transfer: ");
   const has_letter = /[a-zA-z!-/:-@[-~]/.test(transfer_amount);
@@ -106,9 +113,17 @@ async function transfer() {
   console.clear();
 
   if (has_letter) {
-    connected();
+    connected(current_user);
     console.log("Please write just the number of what you want to tranfer\n");
+    return current_user;
   }
+
+  current_user.money = current_user.money - parseInt(transfer_amount);
+  receiver.money = receiver.money + parseInt(transfer_amount);
+  db.set("users", users);
+  connected(current_user);
+  console.log(`You have tranfer ${green}${transfer_amount}$${reset_green} to ${green}${receiver.username}${reset_green}\n`);
+  return current_user;
 }
 
-module.exports = { check_balance, deposit, withdrawal };
+module.exports = { check_balance, deposit, withdrawal, transfer };

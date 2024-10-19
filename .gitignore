@@ -1,6 +1,3 @@
 node_modules/
 backups/
 pnpm-lock.yaml
-data-users.json
-index.js
-bank_simulator.js

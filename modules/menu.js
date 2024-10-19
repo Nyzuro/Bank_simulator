@@ -1,6 +1,6 @@
 const readlineSync = require("readline-sync");
-const { create_account, log_in, log_out } = require('./user');
-const { check_balance, deposit, withdrawal } = require('./account');
+const { create_account, log_in, log_out, connected } = require('./user');
+const { check_balance, deposit, withdrawal, transfer } = require('./account');
 
 const red = "\x1b[0;31m";
 const reset_red = "\x1b[0m";
@@ -9,7 +9,7 @@ let current_user;
 
 async function menu() {
   let choice = readlineSync.question(
-    "1 : Create an account\n2 : Log in\n3 : Check the balance\n4 : Make a deposit\n5 : Make a withdrawal\n6 : Log out\n7 : Make a transfer\n"
+    "1 : Create an account\n2 : Log in\n3 : Check the balance\n4 : Make a deposit\n5 : Make a withdrawal\n6 : Make a transfer\n7 : Log out\n"
   );
 
   switch (choice) {
@@ -40,15 +40,17 @@ async function menu() {
       break;
     case "6":
       console.clear();
-      current_user = await log_out(current_user);
+      current_user = await transfer(current_user);
       menu();
       break;
     case "7":
       console.clear();
-      quit();
+      current_user = await log_out(current_user);
+      menu();
       break;
     default:
       console.clear();
+      connected(current_user);
       console.log(`${red}Invalid choice, please try again${reset_red}\n`);
       menu();
       break;

@@ -91,8 +91,9 @@ async function log_out(current_user) {
     return current_user;
   }
 
-  connected(current_user);
   let log_out = readlineSync.question("Are you sure you want to log out (yes/no): ");
+  console.clear();
+  connected(current_user);
 
   if (log_out === "yes") {
     current_user = !current_user;
@@ -104,6 +105,11 @@ async function log_out(current_user) {
     console.clear()
     connected(current_user);
     console.log("Back to the menu...\n");
+    return current_user;
+  }
+  else {
+    console.clear();
+    connected(current_user);
     return current_user;
   }
 }
